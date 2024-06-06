@@ -7,9 +7,9 @@ import java.util.ArrayList;
 public class User {
     private final ObjectId userID;
     private String name;
-    private ArrayList<String> postIDs;
+    private ArrayList<ObjectId> postIDs;
 
-    public User(ObjectId userID, String name, ArrayList<String> postIDs) {
+    public User(ObjectId userID, String name, ArrayList<ObjectId> postIDs) {
         this.userID = userID;
         this.name = name;
         this.postIDs = postIDs;
@@ -27,12 +27,12 @@ public class User {
         this.name = name;
     }
 
-    public ArrayList<String> getPostIDs() {
+    public ArrayList<ObjectId> getPostIDs() {
         return postIDs;
     }
 
-    public void insertPostID(String newPostID) {
-        if(newPostID.isEmpty()) return;
+    public void insertPostID(ObjectId newPostID) {
+        if(newPostID.toString().isEmpty()) return;
         postIDs.add(newPostID);
     }
 }

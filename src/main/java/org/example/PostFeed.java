@@ -35,7 +35,7 @@ public class PostFeed {
             }
 
             posts.add(new Post((ObjectId) d.get("_id"), (String) d.get("title"), (String) d.get("body"),
-                    allTags, (String) d.get("authorName"), (String) d.get("authorID"), commentList));
+                    allTags, (String) d.get("authorName"), (ObjectId) d.get("authorID"), commentList));
         }
 
     }

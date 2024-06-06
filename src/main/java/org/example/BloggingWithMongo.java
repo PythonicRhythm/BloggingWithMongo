@@ -53,7 +53,6 @@ public class BloggingWithMongo
         postDocuments = db.getCollection(postCollection);
         userDocuments = db.getCollection(userCollection);
         System.out.println("Connection was successful!");
-        // initializeUsers();
     }
 
     public boolean authenticateUser() {
@@ -82,9 +81,9 @@ public class BloggingWithMongo
             }
             else {
                 Document doc = possibleMatches.get(0);
-                ArrayList<String> allPosts;
+                ArrayList<ObjectId> allPosts;
                 if(doc.get("posts") == null) allPosts = new ArrayList<>();
-                else allPosts = (ArrayList<String>) doc.get("posts");
+                else allPosts = (ArrayList<ObjectId>) doc.get("posts");
                 currentUser = new User((ObjectId) doc.get("_id"), (String) doc.get("name"), allPosts);
                 return true;
             }
@@ -183,9 +182,66 @@ public class BloggingWithMongo
                     System.out.println("Please enter a number.");
                 }
             }
+        }
+    }
 
+    public void viewYourPosts() {
+        if(currentUser.getPostIDs().isEmpty()) {
+            System.out.println("\nYou haven't created any posts. Try making some!");
+            return;
         }
 
+        int postIndex = 0;
+        while(true) {
+            postFeed.getPosts().get(postIndex).displayPost();
+            System.out.println("Interact with Post?\n1. Post Comment\n2. Previous Post\n" +
+                    "3. Next Post\n4. Exit (or type 'exit');");
+
+            while(true) {
+                System.out.print("> ");
+                String response = consoleReader.nextLine().strip().toLowerCase();
+                if(response.equals("exit")) return;
+
+                try {
+                    int value = Integer.parseInt(response);
+                    if(value < 0 | value > 4) {
+                        System.out.println("Invalid Response. Not a value on the list.");
+                        continue;
+                    }
+
+                    switch (value) {
+                        case 1:
+                            postComment(postFeed.getPosts().get(postIndex).getPostId());
+                            break;
+                        case 2:
+                            if(postIndex-1 < 0) {
+                                System.out.println("You're already at the first post.");
+                                continue;
+                            }
+                            else
+                                postIndex--;
+                            break;
+                        case 3:
+                            if(postIndex+1 >= postFeed.getPosts().size()) {
+                                System.out.println("You're already at the last post.");
+                                continue;
+                            }
+                            else
+                                postIndex++;
+                            break;
+                        case 4:
+                            return;
+                        default:
+                            break;
+                    }
+
+                    break;
+
+                } catch(NumberFormatException ex) {
+                    System.out.println("Please enter a number.");
+                }
+            }
+        }
     }
 
     public static void main( String[] args )
@@ -202,6 +258,7 @@ public class BloggingWithMongo
                     break;
                 // View Your Posts.
                 case 2:
+                    blogProgram.viewYourPosts();
                     break;
                 // Add New Post.
                 case 3:

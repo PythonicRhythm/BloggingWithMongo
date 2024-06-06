@@ -11,10 +11,10 @@ public class Post {
     private ArrayList<String> tags;
     private ArrayList<Comment> comments;
     private String authorName;
-    private String authorID;
+    private ObjectId authorID;
 
     public Post(ObjectId postId, String title, String body, ArrayList<String> tags,
-                String authorName, String authorID, ArrayList<Comment> comments) {
+                String authorName, ObjectId authorID, ArrayList<Comment> comments) {
         this.postId = postId;
         this.title = title;
         this.body = body;
@@ -60,11 +60,11 @@ public class Post {
         this.authorName = author;
     }
 
-    public String getAuthorID() {
+    public ObjectId getAuthorID() {
         return authorID;
     }
 
-    public void setAuthorID(String authorID) {
+    public void setAuthorID(ObjectId authorID) {
         this.authorID = authorID;
     }
 
@@ -77,6 +77,8 @@ public class Post {
     }
 
     public void displayComments() {
+        if(comments.isEmpty()) return;
+
         System.out.println("COMMENTS:");
         for(Comment com: comments) {
             System.out.format("%s%n\t%s%n", com.getCommenterName(), com.getComment());
@@ -104,7 +106,7 @@ public class Post {
 
         System.out.println("\nPOST:");
         System.out.println("-------------------------");
-        System.out.format("%n%s %n%n%s %n%nWritten by: %s%n%nTags: %s%n%n",
+        System.out.format("%s %n%n%s %n%nWritten by: %s%n%nTags: %s%n%n",
                 title, sb, authorName, tags.toString());
         displayComments();
         System.out.println("-------------------------");
