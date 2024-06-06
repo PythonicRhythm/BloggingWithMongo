@@ -43,4 +43,15 @@ public class PostFeed {
     public ArrayList<Post> getPosts() {
         return posts;
     }
+
+    public ArrayList<Post> getUserPosts(ObjectId userID) {
+
+        ArrayList<Post> userPosts = new ArrayList<>();
+        for(Post p: posts) {
+            if(p.getAuthorID().equals(userID))
+                userPosts.add(p);
+        }
+
+        return userPosts;
+    }
 }

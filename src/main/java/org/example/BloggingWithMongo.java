@@ -91,8 +91,8 @@ public class BloggingWithMongo
         }
     }
 
+    // promptUser() will show
     public int promptUser() {
-
         System.out.println("1. View Post Feed\n2. View Your Posts\n3. Add New Post\n4. Exit (or type 'exit')");
         while (true) {
             System.out.print("> ");
@@ -111,15 +111,24 @@ public class BloggingWithMongo
         }
     }
 
+    // postComment() will allow users to post comments on all posts
+    // in the database. They can post a comment on their own posts
+    // or other user's posts. The parameter that is received is the id
+    // of the post that is getting commented to.
     public void postComment(ObjectId postID) {
+
+        // Prompt for content of new comment.
         System.out.println("\nWhat would you like to comment?");
         System.out.print("> ");
         String commentBody = consoleReader.nextLine().strip();
+
+        // Create document representing new comment.
         Document newComment = new Document();
         newComment.put("comment", commentBody);
         newComment.put("commenterName", currentUser.getName());
         newComment.put("commenterID", currentUser.getUserID());
 
+        // Post new commment.
         Document updateFilter = new Document("_id", postID);
         Bson command = Updates.addToSet("comments", newComment);
         UpdateResult result = postDocuments.updateOne(updateFilter, command);
@@ -127,6 +136,12 @@ public class BloggingWithMongo
         System.out.println("Comment Posted!");
     }
 
+    // interactWithPosts() will display all the posts from
+    // all the users that have used the program. Users can not
+    // delete posts from this menu. Users can post a comment on
+    // other user's posts and view them. They can cycle through
+    // posts using next and previous which moves using the
+    // arraylist index of postFeed.getPosts().
     public void interactWithPosts() {
         if(postFeed.getPosts().isEmpty()) {
             System.out.println("Currently there are no posts. Make one!");
@@ -186,6 +201,8 @@ public class BloggingWithMongo
         }
     }
 
+    // deletePost() will delete the post that is represented
+    // by the objectID that is passed as a parameter.
     public void deletePost(ObjectId postToBeDeleted) {
         Document updateFilter = new Document("_id", postToBeDeleted);
         postDocuments.deleteOne(updateFilter);
@@ -193,8 +210,15 @@ public class BloggingWithMongo
         System.out.println("Post was deleted!");
     }
 
+    // addAPost() will allow users to create their own
+    // posts in viewYourPosts(). They are prompted for
+    // a title and body for their new post. If all input
+    // is valid, the post will be created and mongoDB is
+    // updated.
     public void addAPost() {
         Document newPost = new Document();
+
+        // Gather title of new post.
         System.out.println("\nEnter the title of the post.\nEnter 'exit' to return to menu.");
         while(true) {
             System.out.print("> ");
@@ -207,6 +231,8 @@ public class BloggingWithMongo
             newPost.put("title", response);
             break;
         }
+
+        // Gather body of new post.
         System.out.println("\nEnter the body of the post.\nEnter 'exit' to return to menu.");
         while(true) {
             System.out.print("> ");
@@ -220,27 +246,44 @@ public class BloggingWithMongo
             break;
         }
 
+        // Create new post and update mongoDB.
+        // Reinitialize the current status of
+        // all the posts in mongo using
+        // postFeed.initializePosts().
         newPost.put("tags", new BasicDBList());
         newPost.put("comments", new BasicDBList());
         newPost.put("authorID", currentUser.getUserID());
         newPost.put("authorName", currentUser.getName());
         postDocuments.insertOne(newPost);
+        currentUser.insertPostID((ObjectId) newPost.get("_id"));
         postFeed.initializePosts(postDocuments);
         System.out.println("Post was added!");
     }
 
+    // viewYourPosts() will allow the currentUser to view all
+    // the posts that they have made. They can move to next
+    // and to previous posts which is based on arraylist index
+    // that wraps around for QOL. They can also delete and comment
+    // on their own posts from this menu.
     public void viewYourPosts() {
-        if(currentUser.getPostIDs().isEmpty()) {
+        // Gather currentUser posts.
+        ArrayList<Post> userPosts = postFeed.getUserPosts(currentUser.getUserID());
+        if(userPosts.isEmpty()) {
             System.out.println("\nYou haven't created any posts. Try making some!");
             return;
         }
 
+        // While the user doesn't want to exit
+        // cycle through all user posts.
         int postIndex = 0;
         while(true) {
-            postFeed.getPosts().get(postIndex).displayPost();
+            // Display post and options
+            userPosts.get(postIndex).displayPost();
             System.out.println("Interact with Post?\n1. Post Comment\n2. Previous Post\n" +
                     "3. Next Post\n4. Delete Post\n5. Exit (or type 'exit');");
 
+            // inner while loop manages input gathered.
+            // if input was invalid, cycle again.
             while(true) {
                 System.out.print("> ");
                 String response = consoleReader.nextLine().strip().toLowerCase();
@@ -254,28 +297,34 @@ public class BloggingWithMongo
                     }
 
                     switch (value) {
+                        // user posted comment.
                         case 1:
-                            postComment(postFeed.getPosts().get(postIndex).getPostId());
+                            postComment(userPosts.get(postIndex).getPostId());
+                            userPosts = postFeed.getUserPosts(currentUser.getUserID());
                             break;
+                        // user is going left which can wrap around.
                         case 2:
                             if(postIndex-1 < 0) {
-                                postIndex = postFeed.getPosts().size()-1;
-                                continue;
+                                postIndex = userPosts.size()-1;
+                                break;
                             }
                             else
                                 postIndex--;
                             break;
+                        // user went right which can wrap around.
                         case 3:
-                            if(postIndex+1 >= postFeed.getPosts().size()) {
+                            if(postIndex+1 >= userPosts.size()) {
                                 postIndex = 0;
-                                continue;
+                                break;
                             }
                             else
                                 postIndex++;
                             break;
+                        // user deleted a post, which causes them to return.
                         case 4:
-                            deletePost(postFeed.getPosts().get(postIndex).getPostId());
+                            deletePost(userPosts.get(postIndex).getPostId());
                             return;
+                        // user chose to exit the menu.
                         case 5:
                             return;
                         default:
@@ -285,6 +334,7 @@ public class BloggingWithMongo
                     break;
 
                 } catch(NumberFormatException ex) {
+                    // user entered a string.
                     System.out.println("Please enter a number.");
                 }
             }
