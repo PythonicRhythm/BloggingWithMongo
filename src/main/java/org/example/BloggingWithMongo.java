@@ -1,5 +1,6 @@
 package org.example;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -185,6 +186,49 @@ public class BloggingWithMongo
         }
     }
 
+    public void deletePost(ObjectId postToBeDeleted) {
+        Document updateFilter = new Document("_id", postToBeDeleted);
+        postDocuments.deleteOne(updateFilter);
+        postFeed.initializePosts(postDocuments);
+        System.out.println("Post was deleted!");
+    }
+
+    public void addAPost() {
+        Document newPost = new Document();
+        System.out.println("\nEnter the title of the post.\nEnter 'exit' to return to menu.");
+        while(true) {
+            System.out.print("> ");
+            String response = consoleReader.nextLine().strip();
+            if(response.equalsIgnoreCase("exit")) return;
+            if(response.length() < 5) {
+                System.out.println("Not enough characters for a title.");
+                continue;
+            }
+            newPost.put("title", response);
+            break;
+        }
+        System.out.println("\nEnter the body of the post.\nEnter 'exit' to return to menu.");
+        while(true) {
+            System.out.print("> ");
+            String response = consoleReader.nextLine().strip();
+            if(response.equalsIgnoreCase("exit")) return;
+            if(response.length() < 10) {
+                System.out.println("Not enough characters for a body.");
+                continue;
+            }
+            newPost.put("body", response);
+            break;
+        }
+
+        newPost.put("tags", new BasicDBList());
+        newPost.put("comments", new BasicDBList());
+        newPost.put("authorID", currentUser.getUserID());
+        newPost.put("authorName", currentUser.getName());
+        postDocuments.insertOne(newPost);
+        postFeed.initializePosts(postDocuments);
+        System.out.println("Post was added!");
+    }
+
     public void viewYourPosts() {
         if(currentUser.getPostIDs().isEmpty()) {
             System.out.println("\nYou haven't created any posts. Try making some!");
@@ -195,7 +239,7 @@ public class BloggingWithMongo
         while(true) {
             postFeed.getPosts().get(postIndex).displayPost();
             System.out.println("Interact with Post?\n1. Post Comment\n2. Previous Post\n" +
-                    "3. Next Post\n4. Exit (or type 'exit');");
+                    "3. Next Post\n4. Delete Post\n5. Exit (or type 'exit');");
 
             while(true) {
                 System.out.print("> ");
@@ -204,7 +248,7 @@ public class BloggingWithMongo
 
                 try {
                     int value = Integer.parseInt(response);
-                    if(value < 0 | value > 4) {
+                    if(value < 0 | value > 5) {
                         System.out.println("Invalid Response. Not a value on the list.");
                         continue;
                     }
@@ -230,6 +274,9 @@ public class BloggingWithMongo
                                 postIndex++;
                             break;
                         case 4:
+                            deletePost(postFeed.getPosts().get(postIndex).getPostId());
+                            return;
+                        case 5:
                             return;
                         default:
                             break;
@@ -262,6 +309,7 @@ public class BloggingWithMongo
                     break;
                 // Add New Post.
                 case 3:
+                    blogProgram.addAPost();
                     break;
                 // Exit
                 case 4:

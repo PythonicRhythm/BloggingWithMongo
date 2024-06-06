@@ -85,6 +85,17 @@ public class Post {
         }
     }
 
+    public void displayTags() {
+        if(tags.isEmpty()) return;
+
+        System.out.println();
+        for(int i = 0; i < tags.size()-1; i++) {
+            System.out.format("%s,", tags.get(i));
+        }
+        System.out.println(tags.get(tags.size()-1));
+        System.out.println();
+    }
+
     public void displayPost() {
 
         String[] splitBySpace = body.split(" ");
@@ -106,8 +117,9 @@ public class Post {
 
         System.out.println("\nPOST:");
         System.out.println("-------------------------");
-        System.out.format("%s %n%n%s %n%nWritten by: %s%n%nTags: %s%n%n",
-                title, sb, authorName, tags.toString());
+        System.out.format("%s %n%n%s %n%nWritten by: %s%n",
+                title, sb, authorName);
+        displayTags();
         displayComments();
         System.out.println("-------------------------");
     }
