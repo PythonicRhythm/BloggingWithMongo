@@ -157,16 +157,16 @@ public class BloggingWithMongo
                             break;
                         case 2:
                             if(postIndex-1 < 0) {
-                                System.out.println("You're already at the first post.");
-                                continue;
+                                postIndex = postFeed.getPosts().size()-1;
+                                break;
                             }
                             else
                                 postIndex--;
                             break;
                         case 3:
                             if(postIndex+1 >= postFeed.getPosts().size()) {
-                                System.out.println("You're already at the last post.");
-                                continue;
+                                postIndex = 0;
+                                break;
                             }
                             else
                                 postIndex++;
@@ -259,7 +259,7 @@ public class BloggingWithMongo
                             break;
                         case 2:
                             if(postIndex-1 < 0) {
-                                System.out.println("You're already at the first post.");
+                                postIndex = postFeed.getPosts().size()-1;
                                 continue;
                             }
                             else
@@ -267,7 +267,7 @@ public class BloggingWithMongo
                             break;
                         case 3:
                             if(postIndex+1 >= postFeed.getPosts().size()) {
-                                System.out.println("You're already at the last post.");
+                                postIndex = 0;
                                 continue;
                             }
                             else

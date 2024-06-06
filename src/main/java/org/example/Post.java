@@ -79,9 +79,9 @@ public class Post {
     public void displayComments() {
         if(comments.isEmpty()) return;
 
-        System.out.println("COMMENTS:");
+        System.out.println("\nCOMMENTS:");
         for(Comment com: comments) {
-            System.out.format("%s%n\t%s%n", com.getCommenterName(), com.getComment());
+            System.out.format("%s%n\t- %s%n", com.getCommenterName(), com.getComment());
         }
     }
 
@@ -93,7 +93,6 @@ public class Post {
             System.out.format("%s,", tags.get(i));
         }
         System.out.println(tags.get(tags.size()-1));
-        System.out.println();
     }
 
     public void displayPost() {
