@@ -15,38 +15,39 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static com.mongodb.client.model.Filters.eq;
-
 /**
- *
+ *  BloggingWithMongo is a java blogging program that works with MongoDB.
+ *  Users can view posts saved by other users, post comments on everyone's
+ *  posts that exist in the database, and manage their own posts that exist
+ *  in the program. Users can create their own posts and delete their own posts
+ *  but they can not alter other user's posts besides commenting.
  */
 public class BloggingWithMongo
 {
-    private final String DB_String = "mongodb://localhost:27017";
-    private final String DB_Name = "BloggingWithMongo";
-    private final String postCollection = "posts";
-    private final String userCollection = "users";
-    private final Scanner consoleReader = new Scanner(System.in);
-    private MongoClient client;
-    private MongoDatabase db;
-    private MongoCollection<Document> postDocuments;
-    private MongoCollection<Document> userDocuments;
-    private PostFeed postFeed;
-    private User currentUser;
+    private final String DB_String = "mongodb://localhost:27017";   // The connection string to connect to MongoDB
+    private final String DB_Name = "BloggingWithMongo";             // The database name.
+    private final String postCollection = "posts";                  // The collection name that contains all posts.
+    private final String userCollection = "users";                  // The collection name that contains all users.
+    private final Scanner consoleReader = new Scanner(System.in);   // Console Reader.
+    private MongoClient client;                                     // The client connection to Mongo.
+    private MongoDatabase db;                                       // MongoDB database.
+    private MongoCollection<Document> postDocuments;                // Collection for all posts.
+    private MongoCollection<Document> userDocuments;                // Collection for all users.
+    private PostFeed postFeed;                                      // The list of all posts that exist in system.
+    private User currentUser;                                       // The active user of the program.
 
     public BloggingWithMongo() {
         attemptDBConnection();
         postFeed = new PostFeed(postDocuments);
     }
 
+    // Get the active user in the program.
     public User getCurrentUser() {
         return currentUser;
     }
 
-    public PostFeed getPostFeed() {
-        return postFeed;
-    }
-
+    // attemptDBConnection() will attempt to connection to the
+    // mongoDB database that is saved locally.
     public void attemptDBConnection() {
         System.out.println("Attempting to connect with database...");
         client = MongoClients.create(DB_String);
@@ -56,6 +57,11 @@ public class BloggingWithMongo
         System.out.println("Connection was successful!");
     }
 
+    // authenticateUser() will receive a username and password from the user
+    // and check if it matches any users that are saved in MongoDB. If
+    // the credentials match a user that exists in the DB return true. If
+    // there is no match, then keep looping until there is a match or the
+    // user wants to exit the program.
     public boolean authenticateUser() {
         while(true) {
             ArrayList<Document> possibleMatches = new ArrayList<>();
@@ -91,14 +97,19 @@ public class BloggingWithMongo
         }
     }
 
-    // promptUser() will show
+    // promptUser() will display the menu to the user via the terminal.
+    // Checks the response received from the user and if it's valid,
+    // it returns the choice by the user, else it loops.
     public int promptUser() {
+        // Print menu
         System.out.println("1. View Post Feed\n2. View Your Posts\n3. Add New Post\n4. Exit (or type 'exit')");
         while (true) {
+            // Gather user response.
             System.out.print("> ");
             String response = consoleReader.nextLine().strip().toLowerCase();
             if(response.equals("exit")) return -1;
             try {
+                // Convert to int and if invalid, try again.
                 int value = Integer.parseInt(response);
                 if(value < 1 || value > 4) {
                     System.out.println("Invalid response. Try again.");
@@ -106,6 +117,7 @@ public class BloggingWithMongo
                 }
                 return value;
             } catch(NumberFormatException ex) {
+                // User entered a string.
                 System.out.println("Please enter a number.");
             }
         }

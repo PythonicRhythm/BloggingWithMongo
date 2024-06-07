@@ -4,6 +4,13 @@ import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 
+/**
+ * The Post class represents a blog post that can be interacted with by
+ * users. A post class will display a simple console UI when displayPost()
+ * is called. This class is mostly used for a UI representation of a blog
+ * post.
+ */
+
 public class Post {
     private final ObjectId postId;
     private String title;
@@ -24,58 +31,19 @@ public class Post {
         this.comments = comments;
     }
 
+    // Get postID
     public ObjectId getPostId() {
         return postId;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public ArrayList<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(ArrayList<String> tags) {
-        this.tags = tags;
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String author) {
-        this.authorName = author;
-    }
-
+    // Get the authorID
     public ObjectId getAuthorID() {
         return authorID;
     }
 
-    public void setAuthorID(ObjectId authorID) {
-        this.authorID = authorID;
-    }
-
-    public ArrayList<Comment> getComments() {
-        return comments;
-    }
-
-    public void addComment(Comment com) {
-        comments.add(com);
-    }
-
+    // displayComments() will display all the comments
+    // the posts has by printing the commenter name then the
+    // comment body.
     public void displayComments() {
         if(comments.isEmpty()) return;
 
@@ -85,6 +53,8 @@ public class Post {
         }
     }
 
+    // displayTags() will display all the tags
+    // dedicated to the post.
     public void displayTags() {
         if(tags.isEmpty()) return;
 
@@ -95,6 +65,9 @@ public class Post {
         System.out.println(tags.get(tags.size()-1));
     }
 
+    // displayPost() will display the post and everything
+    // that contains a post such as title, body, tags,
+    // and comments. Displays the post to the console.
     public void displayPost() {
 
         String[] splitBySpace = body.split(" ");
