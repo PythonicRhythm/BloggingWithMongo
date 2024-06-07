@@ -12,13 +12,13 @@ import java.util.ArrayList;
  */
 
 public class Post {
-    private final ObjectId postId;
-    private String title;
-    private String body;
-    private ArrayList<String> tags;
-    private ArrayList<Comment> comments;
-    private String authorName;
-    private ObjectId authorID;
+    private final ObjectId postId;          // The ID of the post on Mongo.
+    private String title;                   // The title of the post.
+    private String body;                    // The body content of the post itself.
+    private ArrayList<String> tags;         // An array of tags that the post has.
+    private ArrayList<Comment> comments;    // An array of comments that the post has.
+    private String authorName;              // The name of the user who made the post.
+    private ObjectId authorID;              // The id of the user who made the post.
 
     public Post(ObjectId postId, String title, String body, ArrayList<String> tags,
                 String authorName, ObjectId authorID, ArrayList<Comment> comments) {
@@ -70,6 +70,7 @@ public class Post {
     // and comments. Displays the post to the console.
     public void displayPost() {
 
+        // Appends a new line on every 6th word.
         String[] splitBySpace = body.split(" ");
         StringBuffer sb = new StringBuffer();
         int wordCounter = 0;
@@ -87,6 +88,7 @@ public class Post {
 
         }
 
+        // Print the post UI.
         System.out.println("\nPOST:");
         System.out.println("-------------------------");
         System.out.format("%s %n%n%s %n%nWritten by: %s%n",
